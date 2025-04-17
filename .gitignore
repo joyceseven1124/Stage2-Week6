@@ -1,0 +1,6 @@
+.qodo
+doc2vec_model_v9.dv.vectors.npy
+doc2vec_model_v9
+MyClassifier_v9.py
+my_trained_model_v9.pt
+__pycache__

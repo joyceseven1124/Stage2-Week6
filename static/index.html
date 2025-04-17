@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>文本預測系統</title>
+    <style>
+        body{
+            padding: 0px;
+            margin: 0px;
+        }
+        .container {
+            /* max-width: 800px; */
+            margin: 0 auto;
+            /* padding: 20px; */
+            display: grid;
+            align-items: center;
+            justify-self: center;
+            text-align: center;
+        }
+        h1{
+            background-color: #718ba8;
+            color: white;
+            padding: 20px;
+            margin: 0px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        .result-block {
+            display: none;
+            margin-top: 30px;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            width: fit-content;
+            margin: auto;
+            display: grid;
+        }
+        .form-label{
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: #333;
+            font-weight: 700;
+        }
+        input {
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            outline: none;
+            font-size: 16px;
+            transition: box-shadow 0.2s ease-in-out, border-color 0.2s;
+            background-color: white;
+            width: 360px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #718ba8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: fit-content;
+            margin: auto;
+        }
+        .result-text{
+            margin-top: 10px;
+            font-size: 20px;
+            color: #333;
+            font-weight: 700;
+        }
+        .suggestion-buttons {
+            margin-top: 10px;
+        }
+        .suggestion-button {
+            margin-right: 10px;
+            padding: 10px;
+            background-color: #94b8d8;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #predictionResult{
+            font-size: 24px;
+            color: #333;
+            font-weight: 700;
+            padding: 20px;
+            line-height: 1.5;
+            display: block;
+        }
+        #predictionResult:before{
+            content: "「";
+            font-size: 30px;
+            color: #333;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+        #predictionResult:after{
+            content: "」";
+            font-size: 30px;
+            color: #333;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>歡迎使用短文本分類預測</h1>
+        <div class="form-group">
+            <label class="form-label" for="inputText">輸入一篇文章標題</label>
+            <input type="text" id="inputText" placeholder="請輸入要預測的文本..."></input>
+            <button id="submitBtn" onclick="predict()">預測分類</button>
+        </div>
+        
+        <div id="resultBlock" class="result-block">
+            <div class="result-text">預測結果：</div>
+            <span id="predictionResult"></span>
+            <div class="result-text">你心目中的類別：</div>
+            <div class="suggestion-buttons">
+                <button class="suggestion-button" onclick="feedback('baseball')">baseball</button>
+                <button class="suggestion-button" onclick="feedback('Boy-Girl')">Boy-Girl</button>
+                <button class="suggestion-button" onclick="feedback('c_chat')">c_chat</button>
+                <button class="suggestion-button" onclick="feedback('hatepolitics')">hatepolitics</button>
+                <button class="suggestion-button" onclick="feedback('Lifeismoney')">Lifeismoney</button>
+                <button class="suggestion-button" onclick="feedback('Military')">Military</button>
+                <button class="suggestion-button" onclick="feedback('pc_shopping')">pc_shopping</button>
+                <button class="suggestion-button" onclick="feedback('stock')">stock</button>
+                <button class="suggestion-button" onclick="feedback('Tech_Job')">Tech_Job</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function predict() {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('請輸入文本');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = '處理中...';
+
+            try {
+                // 將 text 加入查詢參數
+                const response = await fetch(`/api/model/prediction?title=${encodeURIComponent(text)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+                document.getElementById('predictionResult').textContent = data.prediction;
+                document.getElementById('resultBlock').style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = '預測分類';
+            } catch (error) {
+                alert('預測發生錯誤');
+                console.error('Error:', error);
+                btn.disabled = false;
+                btn.textContent = '預測分類';
+            }
+        }
+
+        async function feedback(board) {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                alert('請輸入文本');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/model/feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: text,      // 對應 Python 的 input_data.text
+                        feedback: board  // 對應 Python 的 feedback 字串
+                    })
+                });
+
+                if (response.ok) {
+                    alert('回饋已保存');
+                } else {
+                    alert('回饋保存失敗');
+                }
+            } catch (error) {
+                alert('預測發生錯誤');
+                console.error('Error:', error);
+            }
+        }
+
+    </script>
+</body>
+</html> 
