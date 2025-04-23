@@ -4,3 +4,4 @@ doc2vec_model_v9
 MyClassifier_v9.py
 my_trained_model_v9.pt
 __pycache__
+mlp-test-env/

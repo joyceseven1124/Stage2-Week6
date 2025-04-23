@@ -40,10 +40,11 @@ async def feedback(input_data: FeedbackInput):
     }
     # 轉成 DataFrame 再寫入 CSV
     df = pd.DataFrame([data])
-    df.to_csv("user-labeled-titles.csv", mode='a', index=False, header=not os.path.exists("feedback.csv"), encoding='utf-8-sig')
+    df.to_csv("user-labeled-titles.csv", mode='a', index=False, header=not os.path.exists("user-labeled-titles.csv"), encoding='utf-8-sig')
 
     return {"message": "Feedback saved!"}
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
+    # uvicorn.run(app, host="0.0.0.0", port=8000)

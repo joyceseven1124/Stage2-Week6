@@ -1,9 +1,7 @@
 from ckip_transformers.nlp import CkipWordSegmenter, CkipPosTagger
 import torch
 from gensim.models import Doc2Vec
-import numpy as np
 from classifier_model.MyClassifier_v10 import MyClassifier
-from ckip_transformers.nlp import CkipWordSegmenter, CkipPosTagger
 
 class CKIPTokenizer:
     def __init__(self, model_name='albert-base'):
